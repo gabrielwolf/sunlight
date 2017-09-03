@@ -57,8 +57,7 @@ void loop() {
   // read poti in 10 bit
   readValue = analogRead(potPin);
 
-  // map variable to number of pixels and add sunTailSize left and right, then we have twilight befor sunrise and after sunset
-  
+  // map variable to number of pixels, and add sunTailSize left and right, then we have twilight before sunrise and after sunset
   pixel = map(readValue, 0, 1023, - sunTailSize, NUM_LEDS - 1 + sunTailSize);
 
   // debug via serial monitoring
@@ -77,8 +76,39 @@ void loop() {
     strip.setPixelColor(pixel + i, neopix_gamma[tailBrightness - map(i, 0, sunTailSize, 0, tailBrightness)], 0, 0, 0);
   }
 
+  // add a blue sky background color to all the strip testwise
+  for (int i = 0; i < NUM_LEDS; i++)
+  {
+    uint32_t color = strip.getPixelColor(i);
+    uint8_t r = red(color);
+    uint8_t g = green(color);
+    uint8_t b = blue(color);
+    uint8_t w = white(color);
+    strip.setPixelColor(i, r, g, b | 1, w);   // bitwise OR of the new colors (simply add a layer)
+  }
+
   // all LEDs shall show their calculated values
   strip.show();
 
+}
+
+// ---- Tools ----
+
+// get 8 bit RGBW values from a 32 bit color
+
+uint8_t white(uint32_t c) {
+  return (c >> 24);
+}
+
+uint8_t red(uint32_t c) {
+  return (c >> 16);
+}
+
+uint8_t green(uint32_t c) {
+  return (c >> 8);
+}
+
+uint8_t blue(uint32_t c) {
+  return (c);
 }
 
