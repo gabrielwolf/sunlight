@@ -49,12 +49,17 @@ void setup() {
 
 
 void loop() {
+  // sun with variable tail (everything plain red for testing)
+  int16_t sunTailSize = NUM_LEDS / 2 * 0.15;     // the fraction between 0 and 1 is a percentage of the number of pixels
+  uint8_t sunBrightness = 150;
+  uint8_t tailBrightness = sunBrightness * 2 / 3;
 
   // read poti in 10 bit
   readValue = analogRead(potPin);
 
-  // map to number of pixels
-  pixel = map(readValue, 0, 1023, 0, NUM_LEDS - 1);
+  // map variable to number of pixels and add sunTailSize left and right, then we have twilight befor sunrise and after sunset
+  
+  pixel = map(readValue, 0, 1023, - sunTailSize, NUM_LEDS - 1 + sunTailSize);
 
   // debug via serial monitoring
   // Serial.print("readvalue: ");
@@ -62,11 +67,6 @@ void loop() {
 
   // wipe values of all pixels for starting calculation fresh in every loop
   strip.clear();
-
-  // sun with variable tail (everything plain red for testing)
-  uint16_t sunTailSize = NUM_LEDS / 2 * 0.15;     // the fraction between 0 and 1 is a percentage of the number of pixels
-  uint8_t sunBrightness = 140;
-  uint8_t tailBrightness = sunBrightness * 2 / 3;
 
   // set the center dot
   strip.setPixelColor(pixel, sunBrightness, 0, 0, 0);
