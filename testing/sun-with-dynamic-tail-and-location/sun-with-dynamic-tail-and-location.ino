@@ -1,6 +1,6 @@
 // Sunlight
 
-// The first small test of a sun module. Hue is limited to red.
+// First small test of a sun module. Hue is limited to red.
 // Video at: https://vimeo.com/wolfzeitlos/sun-red
 // Git at: https://github.com/gabrielwolf/sunlight
 
@@ -11,7 +11,7 @@
 
 #define PIN 6
 #define NUM_LEDS 144
-#define BRIGHTNESS 200
+#define BRIGHTNESS 255
 
 const int potPin = A0;  // the purpose of the poti is testing variables tactically
 int readValue;
@@ -49,12 +49,12 @@ void setup() {
 
 
 void loop() {
-  
+
   // read poti in 10 bit
   readValue = analogRead(potPin);
 
   // map to number of pixels
-  pixel = map(readValue, 0, 1023, 0, strip.numPixels()-1);
+  pixel = map(readValue, 0, 1023, 0, NUM_LEDS - 1);
 
   // debug via serial monitoring
   // Serial.print("readvalue: ");
@@ -64,20 +64,21 @@ void loop() {
   strip.clear();
 
   // sun with variable tail (everything plain red for testing)
-  int sunTailSize = strip.numPixels() / 2 * 0.25;     // the fraction between 0 and 1 is a percentage of the number of pixels
-  int sunBrightness = 255;
-  int tailBrightness = sunBrightness * 1 / 4;
+  uint16_t sunTailSize = NUM_LEDS / 2 * 0.15;     // the fraction between 0 and 1 is a percentage of the number of pixels
+  uint8_t sunBrightness = 140;
+  uint8_t tailBrightness = sunBrightness * 2 / 3;
 
   // set the center dot
   strip.setPixelColor(pixel, sunBrightness, 0, 0, 0);
 
   // calc the tails left and right
   for (int i = 1; i <= sunTailSize; i++) {
-    strip.setPixelColor(pixel - i, tailBrightness - map(i, 0, sunTailSize, 0, tailBrightness), 0, 0, 0);
-    strip.setPixelColor(pixel + i, tailBrightness - map(i, 0, sunTailSize, 0, tailBrightness), 0, 0, 0);
+    strip.setPixelColor(pixel - i, neopix_gamma[tailBrightness - map(i, 0, sunTailSize, 0, tailBrightness)], 0, 0, 0);
+    strip.setPixelColor(pixel + i, neopix_gamma[tailBrightness - map(i, 0, sunTailSize, 0, tailBrightness)], 0, 0, 0);
   }
 
   // all LEDs shall show their calculated values
   strip.show();
-  
+
 }
+
