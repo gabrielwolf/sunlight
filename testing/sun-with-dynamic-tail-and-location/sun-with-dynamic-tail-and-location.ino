@@ -49,16 +49,16 @@ void setup() {
 
 
 void loop() {
-  // sun with variable tail (everything plain red for testing)
-  int16_t sunTailSize = NUM_LEDS / 2 * 0.15;     // the fraction between 0 and 1 is a percentage of the number of pixels
+  // sun with variable halo (everything plain red for testing)
+  int16_t sunHaloSize = NUM_LEDS / 2 * 0.15;     // the fraction between 0 and 1 is a percentage of the number of pixels
   uint8_t sunBrightness = 150;
-  uint8_t tailBrightness = sunBrightness * 2 / 3;
+  uint8_t haloBrightness = sunBrightness * 2 / 3;
 
   // read poti in 10 bit
   readValue = analogRead(potPin);
 
-  // map variable to number of pixels, and add sunTailSize left and right, then we have twilight before sunrise and after sunset
-  pixel = map(readValue, 0, 1023, - sunTailSize, NUM_LEDS - 1 + sunTailSize);
+  // map variable to number of pixels, and add sunHaloSize left and right, then we have twilight before sunrise and after sunset
+  pixel = map(readValue, 0, 1023, - sunHaloSize, NUM_LEDS - 1 + sunHaloSize);
 
   // debug via serial monitoring
   // Serial.print("readvalue: ");
@@ -70,10 +70,10 @@ void loop() {
   // set the center dot
   strip.setPixelColor(pixel, sunBrightness, 0, 0, 0);
 
-  // calc the tails left and right
-  for (int i = 1; i <= sunTailSize; i++) {
-    strip.setPixelColor(pixel - i, neopix_gamma[tailBrightness - map(i, 0, sunTailSize, 0, tailBrightness)], 0, 0, 0);
-    strip.setPixelColor(pixel + i, neopix_gamma[tailBrightness - map(i, 0, sunTailSize, 0, tailBrightness)], 0, 0, 0);
+  // calc the halos left and right
+  for (int i = 1; i <= sunHaloSize; i++) {
+    strip.setPixelColor(pixel - i, neopix_gamma[haloBrightness - map(i, 0, sunHaloSize, 0, haloBrightness)], 0, 0, 0);
+    strip.setPixelColor(pixel + i, neopix_gamma[haloBrightness - map(i, 0, sunHaloSize, 0, haloBrightness)], 0, 0, 0);
   }
 
   // add a blue sky background color to all the strip testwise
