@@ -1,7 +1,6 @@
-// Sunlight
+// Sunlight with halo and anti aliasing
 
-// First small test of a sun module. Hue is limited to red.
-// Video at: https://vimeo.com/wolfzeitlos/sun-red
+// Video at: https://vimeo.com/wolfzeitlos/sun-with-halo-and-anti-aliasing
 // Git at: https://github.com/gabrielwolf/sunlight
 
 #include <Adafruit_NeoPixel.h>
@@ -15,7 +14,12 @@
 
 const int potPin = A0;  // the purpose of the poti is testing variables tactically
 int readValue;
-int pixel;
+double subpixel;
+
+double sunSize = NUM_LEDS * 0.3;      // set the sun's size as a percentage of the total number of pixels
+double sunHaloSize = sunSize * 1.5;   // define the halo's size in relation to the sun's size
+double sunBrightness = 200;
+double haloBrightness = sunBrightness * 1 / 4;
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_LEDS, PIN, NEO_GRBW + NEO_KHZ800);
 
@@ -49,42 +53,53 @@ void setup() {
 
 
 void loop() {
-  // sun with variable halo (everything plain red for testing)
-  int16_t sunHaloSize = NUM_LEDS / 2 * 0.15;     // the fraction between 0 and 1 is a percentage of the number of pixels
-  uint8_t sunBrightness = 150;
-  uint8_t haloBrightness = sunBrightness * 2 / 3;
-
   // read poti in 10 bit
   readValue = analogRead(potPin);
 
-  // map variable to number of pixels, and add sunHaloSize left and right, then we have twilight before sunrise and after sunset
-  pixel = map(readValue, 0, 1023, - sunHaloSize, NUM_LEDS - 1 + sunHaloSize);
+  // map position of the poti to the number of pixels, and add imaginary Pixels left and right.
+  // now we can partially see the sun
+  subpixel = mapdouble(readValue, 0, 1023, - sunHaloSize, NUM_LEDS - 1 + sunHaloSize);
 
-  // debug via serial monitoring
-  // Serial.print("readvalue: ");
-  // Serial.println(readValue);
-
-  // wipe values of all pixels for starting calculation fresh in every loop
+  // wipe values of all pixels to start every loop a clean calculating
   strip.clear();
 
-  // set the center dot
-  strip.setPixelColor(pixel, sunBrightness, 0, 0, 0);
+  // set the actual position and width of the halo
+  double from = subpixel - sunHaloSize / 2;
+  double to = subpixel + sunHaloSize / 2;
 
-  // calc the halos left and right
-  for (int i = 1; i <= sunHaloSize; i++) {
-    strip.setPixelColor(pixel - i, neopix_gamma[haloBrightness - map(i, 0, sunHaloSize, 0, haloBrightness)], 0, 0, 0);
-    strip.setPixelColor(pixel + i, neopix_gamma[haloBrightness - map(i, 0, sunHaloSize, 0, haloBrightness)], 0, 0, 0);
+  // debug via serial monitoring
+  // Serial.println(from);
+
+  // Halo
+  for (int i = from + 1; i <= to; i++) {
+    double cosinus = mapdouble(i, from, to, -PI / 2, PI / 2);
+    strip.setPixelColor(i, haloBrightness * abs(cos(cosinus)), 0, 0, 0);
   }
 
-  // add a blue sky background color to all the strip testwise
-  for (int i = 0; i < NUM_LEDS; i++)
-  {
+
+  // set the actual position and width of the sun
+  from = subpixel - sunSize / 2;
+  to = subpixel + sunSize / 2;
+
+  // Sun
+  for (int i = from + 1; i <= to; i++) {
     uint32_t color = strip.getPixelColor(i);
     uint8_t r = red(color);
     uint8_t g = green(color);
     uint8_t b = blue(color);
     uint8_t w = white(color);
-    strip.setPixelColor(i, r, g, b | 1, w);   // bitwise OR of the new colors (simply add a layer)
+    double cosinus = mapdouble(i, from, to, -PI / 2, PI / 2);
+    strip.setPixelColor(i, r + sunBrightness * pow(abs(cos(cosinus)), 3), 0, 0, 0);   // cosine is pimped, to sharpen the edge of the sun
+  }
+
+  // add gamma to all pixels
+  for (int i = 0; i <= NUM_LEDS; i++) {
+    uint32_t color = strip.getPixelColor(i);
+    uint8_t r = red(color);
+    uint8_t g = green(color);
+    uint8_t b = blue(color);
+    uint8_t w = white(color);
+    strip.setPixelColor(i, neopix_gamma[(byte)r], neopix_gamma[(byte)g], neopix_gamma[(byte)b], neopix_gamma[(byte)w]);
   }
 
   // all LEDs shall show their calculated values
@@ -95,7 +110,6 @@ void loop() {
 // ---- Tools ----
 
 // get 8 bit RGBW values from a 32 bit color
-
 uint8_t white(uint32_t c) {
   return (c >> 24);
 }
@@ -110,5 +124,11 @@ uint8_t green(uint32_t c) {
 
 uint8_t blue(uint32_t c) {
   return (c);
+}
+
+// mapping in double precision
+double mapdouble(double x, double in_min, double in_max, double out_min, double out_max)
+{
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
