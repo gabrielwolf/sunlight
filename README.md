@@ -16,7 +16,7 @@ The idea is to realtime measure colors and intensity of daylight, shining throug
 
 - Sun calculations
   1. Calculate the sun's actual position on the sky as a percentage between sunrise and sunset. Use date, daytime, coordinates and meters above sea level
-  2. Map the calculated position relative to the number of pixels on the stripe (from sunrise 0% to sunset 100%)
+  2. ✓ Map the calculated position relative to the number of pixels on the stripe (from sunrise 0% to sunset 100%)
   We're assuming that the LED stripe is orientated east to west (or vice versa) to simulate the movement of the star during the day.
-  3. The "width" of the sun in pixels is a percentage of the total pixel length of the stripe
-  4. The intensity of a actual sun pixel should be calculated via cosine: -π (start) to 0 (spot) to π (end)
+  3. ✓ The "width" of the sun in pixels is a percentage of the total pixel length of the stripe
+  4. ✓ The intensity of a actual sun pixel should be calculated via cosine: -π/2 (start) to 0 (spot) to π/2 (end)
