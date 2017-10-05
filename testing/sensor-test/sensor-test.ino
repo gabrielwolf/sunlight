@@ -130,6 +130,16 @@ void loop() {
   // }
 
   for (int i = 0; i <= NUM_LEDS; i++) {
+    if (rcolour == -1) {
+      rcolour = 0;
+    }
+    if (gcolour == -1) {
+      gcolour = 0;
+    }
+    if (bcolour == -1) {
+      bcolour = 0;
+    }
+
     Serial.print(rcolour);
     Serial.print(", ");
     Serial.print(gcolour);
