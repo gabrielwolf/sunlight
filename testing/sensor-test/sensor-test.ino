@@ -8,7 +8,7 @@
 
 #define PIN 6
 #define NUM_LEDS 144
-#define BRIGHTNESS 130
+#define BRIGHTNESS 30
 
 Adafruit_NeoPixel strip =
     Adafruit_NeoPixel(NUM_LEDS, PIN, NEO_GRBW + NEO_KHZ800);
@@ -40,6 +40,7 @@ int blueled = 6;
 int S3 = 8;
 int S2 = 7;
 int outpin = 4;
+int ledpin = 2;
 
 unsigned int plusewidth;
 
@@ -56,11 +57,14 @@ void setup() {
   pinMode(S3, OUTPUT);
   pinMode(S2, OUTPUT);
   pinMode(outpin, INPUT);
+  pinMode(ledpin, OUTPUT);
+
+  digitalWrite(ledpin, LOW);
 
   Serial.print("red");
-  Serial.print(",");
+  Serial.print(", ");
   Serial.print("green");
-  Serial.print(",");
+  Serial.print(", ");
   Serial.println("blue");
 
   strip.setBrightness(BRIGHTNESS);
@@ -125,15 +129,15 @@ void loop() {
   //   rcolour = 0;
   // }
 
-  Serial.print(rcolour);
-  Serial.print(",");
-  Serial.print(gcolour);
-  Serial.print(",");
-  Serial.println(bcolour);
-  Serial.println(" ");
-  Serial.println("");
-
   for (int i = 0; i <= NUM_LEDS; i++) {
+    Serial.print(rcolour);
+    Serial.print(", ");
+    Serial.print(gcolour);
+    Serial.print(", ");
+    Serial.println(bcolour);
+    Serial.println(" ");
+    Serial.println("");
+
     strip.setPixelColor(i, rcolour, gcolour, bcolour, 0);
   }
 
