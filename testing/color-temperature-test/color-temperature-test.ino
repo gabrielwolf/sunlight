@@ -3,11 +3,18 @@
 // - RGBW (32 bit int) -> R, G, B, W (8 bit ints)
 // - R, G, B, W (8 bit ints) -> RGBW (32 bit int)
 
-// - An algorithm from Tanner Helland calculates coresponding RGB values for a
-// given color temperature.
+// --> uint32_t RGB2RGBW(uint16_t red, uint16_t green, uint16_t blue)
+// Calculates RGBW values from a given RGB triplet. Algorithm is based on the
+// selected solution of a StackOverflow answer:
+// https://stackoverflow.com/questions/40312216/converting-rgb-to-rgbw
+
+// --> uint32_t colorTemperature2RGB(double temperature)
+// An algorithm from Tanner Helland that calculates coresponding RGB values for
+// a given color temperature.
 // http://www.tannerhelland.com/4435/convert-temperature-rgb-algorithm-code/
 
-// - An algorithm from Adafruit, which calculates a corrected color temperature
+// --> uint16_t RGB2ColorTemperature(uint16_t r, uint16_t g, uint16_t b)
+// An algorithm from Adafruit, which calculates a corrected color temperature
 // out of RGB values.
 // https://github.com/adafruit/Adafruit_TCS34725/blob/master/Adafruit_TCS34725.cpp
 
@@ -66,6 +73,9 @@ void loop() {
   // rgb = RGBWtoInt(0xff, 0, 0xff, 0x88);
   // Serial.println(rgb);
 
+  // make use of the RGB(W) LED of SK6812 NeoPixels.
+  rgb = RGB2RGBW(maskRed(rgb), maskGreen(rgb), maskBlue(rgb));
+
   for (int i = 0; i <= NUM_LEDS; i++) {
     leds[i] = CRGBW(neopix_gamma[maskRed(rgb)], neopix_gamma[maskGreen(rgb)],
                     neopix_gamma[maskBlue(rgb)], neopix_gamma[maskWhite(rgb)]);
@@ -89,6 +99,36 @@ uint8_t maskRed(uint32_t c) { return (c >> 24); }
 uint8_t maskGreen(uint32_t c) { return (c >> 16); }
 uint8_t maskBlue(uint32_t c) { return (c >> 8); }
 uint8_t maskWhite(uint32_t c) { return (c); }
+
+uint32_t RGB2RGBW(uint16_t red, uint16_t green, uint16_t blue) {
+  // Get the maximum between R, G, and B
+  float tM = max(red, max(green, blue));
+
+  // If the maximum value is 0, immediately return pure black.
+  if (tM == 0) return RGBWtoInt(0, 0, 0, 0);
+
+  // This section serves to figure out what the color with 100% hue is
+  float multiplier = 255.0f / tM;
+  float hR = red * multiplier;
+  float hG = green * multiplier;
+  float hB = blue * multiplier;
+
+  // This calculates the Whiteness (not strictly speaking luminance) of the
+  // color
+  float M = max(hR, max(hG, hB));
+  float m = min(hR, min(hG, hB));
+  float luminance = ((M + m) / 2.0f - 127.5f) * (255.0f / 127.5f) / multiplier;
+
+  // Calculate the output values
+  red = (uint8_t)(red - luminance);
+  green = (uint8_t)(green - luminance);
+  blue = (uint8_t)(blue - luminance);
+  uint8_t white = (uint8_t)luminance * 0.6;  // 0.6 is a first subjective
+                                             // correction towards the expected
+                                             // sample RGB color impression.
+
+  return RGBWtoInt(red, green, blue, white);
+}
 
 // -------- color temperature --------
 
