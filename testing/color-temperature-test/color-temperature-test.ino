@@ -53,7 +53,7 @@ void setup() {
 }
 
 void loop() {
-  int potValue = analogRead(potPin);
+  uint32_t potValue = analogRead(potPin);
   potValue = map(potValue, 0, 1023, 0, 20000);
 
   // Serial.print("potValue=");
