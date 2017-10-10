@@ -76,6 +76,8 @@ void loop() {
   // make use of the RGB(W) LED of SK6812 NeoPixels.
   rgb = RGB2RGBW(maskRed(rgb), maskGreen(rgb), maskBlue(rgb));
 
+  printRGBW(maskRed(rgb), maskGreen(rgb), maskBlue(rgb), maskWhite(rgb));
+
   for (int i = 0; i <= NUM_LEDS; i++) {
     leds[i] = CRGBW(neopix_gamma[maskRed(rgb)], neopix_gamma[maskGreen(rgb)],
                     neopix_gamma[maskBlue(rgb)], neopix_gamma[maskWhite(rgb)]);
@@ -83,6 +85,24 @@ void loop() {
 
     FastLED.show();
   }
+}
+
+// -------- debug helper --------
+
+void printRGBW(unsigned int red, unsigned int green, unsigned int blue,
+               unsigned int white) {
+  Serial.print("R=");
+  Serial.print(red);
+  Serial.print(" ");
+  Serial.print("G=");
+  Serial.print(green);
+  Serial.print(" ");
+  Serial.print("B=");
+  Serial.print(blue);
+  Serial.print(" ");
+  Serial.print("W=");
+  Serial.print(white);
+  Serial.println("");
 }
 
 // -------- color variable tools --------
