@@ -1,7 +1,7 @@
 // -------- Some handy color functions --------
 
-// - RGB (32 bit int) -> R, G, B, W (8 bit ints)
-// - R, G, B, W (8 bit ints) -> RGB (32 bit int)
+// - RGBW (32 bit int) -> R, G, B, W (8 bit ints)
+// - R, G, B, W (8 bit ints) -> RGBW (32 bit int)
 
 // - An algorithm from Tanner Helland calculates coresponding RGB values for a
 // given color temperature.
