@@ -93,7 +93,7 @@ uint8_t maskWhite(uint32_t c) { return (c); }
 // -------- color temperature --------
 
 uint32_t colorTemperature2RGB(double temperature) {
-  if (temperature < 1000) temperature = 1000;
+  // if (temperature < 1000) temperature = 1000;
   if (temperature > 40000) temperature = 40000;
 
   temperature = temperature / 100;
