@@ -82,9 +82,8 @@ void loop() {
     leds[i] = CRGBW(neopix_gamma[maskRed(color)], neopix_gamma[maskGreen(color)],
                     neopix_gamma[maskBlue(color)], neopix_gamma[maskWhite(color)]);
     // leds[i] = CRGBW(maskRed(color), maskGreen(color), maskBlue(color), 0);
-
-    FastLED.show();
   }
+  FastLED.show();
 }
 
 // -------- debug helper --------
