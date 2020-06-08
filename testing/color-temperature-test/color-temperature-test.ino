@@ -42,7 +42,7 @@ byte neopix_gamma[] = {
 #include "FastLED_RGBW.h"
 
 #define NUM_LEDS 144
-#define DATA_PIN 6
+#define DATA_PIN 3
 const uint8_t brightness = 100;
 
 CRGBW leds[NUM_LEDS];
@@ -76,11 +76,13 @@ void loop() {
   // make use of the RGB(W) LED of SK6812 NeoPixels.
   // color = RGB2RGBW(maskRed(rgb), maskGreen(rgb), maskBlue(rgb));
 
-  printRGBW(maskRed(color), maskGreen(color), maskBlue(color), maskWhite(color));
+  printRGBW(maskRed(color), maskGreen(color), maskBlue(color),
+            maskWhite(color));
 
   for (int i = 0; i <= NUM_LEDS; i++) {
-    leds[i] = CRGBW(neopix_gamma[maskRed(color)], neopix_gamma[maskGreen(color)],
-                    neopix_gamma[maskBlue(color)], neopix_gamma[maskWhite(color)]);
+    leds[i] =
+        CRGBW(neopix_gamma[maskRed(color)], neopix_gamma[maskGreen(color)],
+              neopix_gamma[maskBlue(color)], neopix_gamma[maskWhite(color)]);
     // leds[i] = CRGBW(maskRed(color), maskGreen(color), maskBlue(color), 0);
   }
   FastLED.show();
@@ -232,4 +234,3 @@ uint16_t RGB2ColorTemperature(uint16_t r, uint16_t g, uint16_t b) {
   /* Return the results in degrees Kelvin */
   return (uint16_t)cct;
 }
-
